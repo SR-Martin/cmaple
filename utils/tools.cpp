@@ -614,6 +614,7 @@ cmaple::Params::Params() {
   make_consistent = false;
   print_internal_ids = false;
   output_NEXUS = false;
+  output_MAT = false;
   ignore_input_annotations = false;
   allow_rerooting = true;
   compute_SPRTA = false;
@@ -819,6 +820,13 @@ void cmaple::parseArg(int argc, char* argv[], Params& params) {
               strcmp(argv[cnt], "-out-nexus") == 0) {
 
             params.output_NEXUS = true;
+
+            continue;
+        }
+        if (strcmp(argv[cnt], "--estimate-MAT") == 0 ||
+              strcmp(argv[cnt], "-estimate-MAT") == 0) {
+
+            params.output_MAT = true;
 
             continue;
         }

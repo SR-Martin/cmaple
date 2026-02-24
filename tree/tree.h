@@ -446,12 +446,14 @@ class Tree {
      * (bifurcating tree), MUL_TREE (multifurcating tree)
      * @param[in] show_branch_supports TRUE to output the branch supports (aLRT-SH
      * values)
+     * @param[in] show_mutations TRUE to output estimated mutations along tree
      * @return A tree string in NEXUS format
      * @throw std::invalid\_argument if any of the following situations occur.
      * - tree\_type is unknown
      */
     std::string exportNexus(const TreeType tree_type = BIN_TREE,
-                             const bool show_branch_supports = true);
+                            const bool show_branch_supports = true,
+                            const bool show_mutations = false);
     
     /**
      Export a TSV file that contains useful information from SPRTA
@@ -461,6 +463,11 @@ class Tree {
   /*! \endcond */
 
  private:
+  /**
+   * Get mutation string for MATs
+   */
+  std::string getMutationStringForNode(cmaple::PhyloNode& node);
+
   /**
       Pointer  to LoadTree method
    */
@@ -1698,7 +1705,8 @@ bool isDiffFromOrigPlacement(
                                const bool binary,
                                const cmaple::NumSeqsType node_vec_index,
                                const bool print_internal_id,
-                               const bool show_branch_supports);
+                               const bool show_branch_supports,
+                               const bool show_mutations = false);
     
     /**
      Export string of an alternative branch (for SPRTA)
@@ -1799,7 +1807,8 @@ bool isDiffFromOrigPlacement(
      Export tree std::string in NEXUS format
      */
     std::string exportNexus(const bool binary,
-                             const bool show_branch_supports);
+                            const bool show_branch_supports,
+                            const bool show_mutations);
     
     /**
      Traverse the tree to export TSV content
