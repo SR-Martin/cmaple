@@ -624,7 +624,9 @@ cmaple::Params::Params() {
   min_support_alt_branches = 0.01;
   thresh_loglh_optimal_diff_fac = 1.0;
   rate_variation = false;
-  site_specific_rates = false;
+  site_specific_rate_matrix = false;
+  rate_variation_max_num_EM_steps = 20;
+  estimate_rates_during_SPR = false;
   wt_pseudocount = 0.1;
   rates_filename = "";
 
@@ -1284,8 +1286,10 @@ void cmaple::parseArg(int argc, char* argv[], Params& params) {
         continue;
       }
       if (strcmp(argv[cnt], "--site-specific-rates") == 0 ||
+          strcmp(argv[cnt], "--site-specific-rate-matrix") == 0 ||
+          strcmp(argv[cnt], "--site-specific-matrix") == 0 ||
           strcmp(argv[cnt], "-ssr") == 0) {
-        params.site_specific_rates = true;
+        params.site_specific_rate_matrix = true;
         continue;
       }
 
@@ -1299,6 +1303,24 @@ void cmaple::parseArg(int argc, char* argv[], Params& params) {
         } catch (std::invalid_argument e) {
           outError(e.what());
         }
+        continue;
+      }
+
+      if (strcmp(argv[cnt], "--rv-max-EM-steps") == 0) {
+        cnt++;
+        if (cnt >= argc) {
+          outError("Use --rv-max-EM-steps <num_steps>");
+        }
+        try {
+          params.rate_variation_max_num_EM_steps = convert_int(argv[cnt]);
+        } catch (std::invalid_argument e) {
+          outError(e.what());
+        }
+        continue;
+      }
+
+      if (strcmp(argv[cnt], "--estimate-rates-during-SPR") == 0) {
+        params.estimate_rates_during_SPR = true;
         continue;
       }
 
@@ -1378,8 +1400,8 @@ void cmaple::parseArg(int argc, char* argv[], Params& params) {
                 "if SPRTA is not computed. Please use "
                 "`--sprta` if you want to compute SPRTA.");
   }
-  if(params.rate_variation && params.site_specific_rates) {
-      outError("Unable to use rate variation and site-specific rate matrices.\n"
+  if(params.rate_variation && params.site_specific_rate_matrix) {
+      outError("Unable to use rate-variation and site-specific rate matrices.\n"
                 "Please choose either:\n\t \"--rate-variation\" for a rate multiplier at each genomic site, or \n"
                 "\t\"--site-specific-rates\" for an independent rate matrix at each genomic site.");    
   }

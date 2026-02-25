@@ -1031,11 +1031,9 @@ void cmaple::Tree::applySPRTemplate(
 template <const StateType num_states>
 void cmaple::Tree::doRateEstimationTemplate(std::ostream& out_stream) {
 
-  if(params->rate_variation || params->site_specific_rates) {
+  if(params->rate_variation || params->site_specific_rate_matrix) {
     ModelDNARateVariation* rvModel = (ModelDNARateVariation*) model;
     rvModel->estimateRates(this);
-    //rvModel->setAllMatricesToDefault();
-    computeCumulativeRate();
   }
 }
 
@@ -1127,6 +1125,13 @@ void cmaple::Tree::optimizeTreeTopology(const TreeSearchType tree_search_type,
 
     // traverse the tree from root to try improvements on the entire tree
     RealNumType improvement = improveEntireTree<num_states>(tree_search_type, short_range_search);
+
+    if(params->estimate_rates_during_SPR && 
+       (params->rate_variation || params->site_specific_rate_matrix))
+    {
+      ModelDNARateVariation* rvModel = (ModelDNARateVariation*) model;
+      rvModel->estimateRates(this);
+    }
       
     // if only compute SPRTA (~ tree search type = FAST), stop searching further, one round is enough
     if (tree_search_type == FAST_TREE_SEARCH)
@@ -1153,6 +1158,13 @@ void cmaple::Tree::optimizeTreeTopology(const TreeSearchType tree_search_type,
              << endl;
         std::cout << std::setprecision(10)
             << "Tree log likelihood: " << computeLh() << std::endl;
+      }
+
+      if(params->estimate_rates_during_SPR && 
+        (params->rate_variation || params->site_specific_rate_matrix))
+      {
+        ModelDNARateVariation* rvModel = (ModelDNARateVariation*) model;
+        rvModel->estimateRates(this);
       }
 
       // stop trying if the improvement is so small

@@ -13,7 +13,8 @@ class Tree;
 class ModelDNARateVariation : public ModelDNA {
 public:
     ModelDNARateVariation(  const cmaple::ModelBase::SubModel sub_model, PositionType _genome_size, 
-                            bool _use_site_rates, cmaple::RealNumType _wt_pseudocount, std::string _rates_filename);
+                            bool _use_site_rates, cmaple::RealNumType _wt_pseudocount, std::string _rates_filename,
+                            int _max_num_EM_steps);
     virtual ~ModelDNARateVariation();
 
     void estimateRates(cmaple::Tree* tree);
@@ -102,6 +103,7 @@ private:
     cmaple::RealNumType waiting_time_pseudocount;
 
     std::string rates_filename;
+    int max_num_EM_steps;
 
 };
 }

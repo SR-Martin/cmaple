@@ -51,6 +51,7 @@ class Model {
       bool _siteRates,
       cmaple::RealNumType wt_pseudocount,
       const std::string _rates_filename,
+      int _max_num_EM_steps,
       const cmaple::ModelBase::SubModel sub_model = cmaple::ModelBase::DEFAULT,
       const cmaple::SeqRegion::SeqType seqtype = cmaple::SeqRegion::SEQ_AUTO);
 

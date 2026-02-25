@@ -293,6 +293,12 @@ class Tree {
    */
   std::unique_ptr<SeqRegions>& getPartialLhAtNode(const cmaple::Index index);
 
+  /**
+  Compute cumulative rate of the ref genome
+  @throw std::logic\_error if the reference genome is empty
+  */
+  void computeCumulativeRate();
+
   // ----------------- END OF PUBLIC APIs ------------------------------------
   // //
 
@@ -627,12 +633,6 @@ class Tree {
   void initTree(Alignment* aln,
                 Model* model,
                 std::unique_ptr<cmaple::Params>&& params);
-
-  /**
-   Compute cumulative rate of the ref genome
-   @throw std::logic\_error if the reference genome is empty
-   */
-  void computeCumulativeRate();
 
   /*! Optimize the tree topology
    @throw std::logic\_error if unexpected values/behaviors found during the

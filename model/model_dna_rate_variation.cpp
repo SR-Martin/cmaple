@@ -4,8 +4,7 @@
 
 using namespace cmaple;
 
-ModelDNARateVariation::ModelDNARateVariation( const cmaple::ModelBase::SubModel sub_model, PositionType _genome_size, 
-                                                bool _use_site_rates, cmaple::RealNumType _wt_pseudocount, std::string _rates_filename)
+ModelDNARateVariation::ModelDNARateVariation(const cmaple::ModelBase::SubModel sub_model, PositionType _genome_size, bool _use_site_rates, cmaple::RealNumType _wt_pseudocount, std::string _rates_filename, int _max_num_EM_steps)
     : ModelDNA(sub_model) {
     
     genome_size = _genome_size;
@@ -13,6 +12,7 @@ ModelDNARateVariation::ModelDNARateVariation( const cmaple::ModelBase::SubModel 
     mat_size = row_index[num_states_];
     waiting_time_pseudocount = _wt_pseudocount;
     rates_filename = _rates_filename;
+    max_num_EM_steps = _max_num_EM_steps;
 
     mutation_matrices = new RealNumType[mat_size * genome_size]();
     transposed_mutation_matrices = new RealNumType[mat_size * genome_size]();
@@ -88,22 +88,39 @@ bool ModelDNARateVariation::updateMutationMatEmpirical() {
 
 void ModelDNARateVariation::estimateRates(cmaple::Tree* tree) {
     rates_estimated = true;
-    if(use_site_rates) {
-        estimateRatePerSite(tree);
-
-    } else {
-        if(rates_filename.size() == 0) {
-            RealNumType old_LK = -std::numeric_limits<double>::infinity();
-            RealNumType new_LK = tree->computeLh();
-            int num_steps = 0;
-            while(new_LK - old_LK > 1 && num_steps < 20) {
-                estimateRatesPerSitePerEntry(tree);
-                old_LK = new_LK;
-                new_LK = tree->computeLh();
-            }  
+    if(rates_filename.size() == 0) {
+        RealNumType old_LK = -std::numeric_limits<double>::infinity();
+        RealNumType new_LK = tree->computeLh();
+        if(cmaple::verbose_mode > VB_MIN) 
+        {
+            std::cout << "Estimation mutation rates using EM..." << std::endl;
+            std::cout << "Starting log-LK: " << 
+            std::setprecision(10) << new_LK << std::endl;
         }
-    }
 
+        int num_steps = 0;
+        while(abs(new_LK - old_LK) > 1 && num_steps < max_num_EM_steps) 
+        {
+            if(use_site_rates) 
+            {
+                estimateRatePerSite(tree);
+            }
+            else
+            {
+                estimateRatesPerSitePerEntry(tree);
+            }
+            old_LK = new_LK;
+            tree->computeCumulativeRate();
+            new_LK = tree->computeLh();
+            if(cmaple::verbose_mode > VB_MIN) 
+            {
+                std::cout << "EM round " << num_steps + 1 << ": " << 
+                std::setprecision(10) << new_LK << std::endl;
+            }
+            num_steps++;
+        }  
+    }
+    
     // Write out rate matrices to file
     if(cmaple::verbose_mode > VB_MIN) 
     {
@@ -128,7 +145,7 @@ void ModelDNARateVariation::estimateRates(cmaple::Tree* tree) {
 }
 
 void ModelDNARateVariation::estimateRatePerSite(cmaple::Tree* tree){
-    std::cout << "Estimating mutation rate per site..." << std::endl;
+    //std::cout << "Estimating mutation rate per site..." << std::endl;
     RealNumType* waiting_times = new RealNumType[num_states_ * genome_size];
     RealNumType* num_substitutions = new RealNumType[genome_size];
     for(int i = 0; i < genome_size; i++) {
@@ -204,7 +221,7 @@ void ModelDNARateVariation::estimateRatePerSite(cmaple::Tree* tree){
         } else {
             RealNumType expected_rate_no_substitution = 0;
             for(int j = 0; j < num_states_; j++) {
-                RealNumType summand = waiting_times[i * num_states_ + j] * abs(diagonal_mut_mat[j]);
+                RealNumType summand = waiting_times[i * num_states_ + j] * abs(getDiagonalMutationMatrixEntry(j,i));
                 expected_rate_no_substitution += summand;
             }
             if(expected_rate_no_substitution <= 0.01) {
@@ -224,7 +241,7 @@ void ModelDNARateVariation::estimateRatePerSite(cmaple::Tree* tree){
             RealNumType row_sum = 0;
             for(int stateB = 0; stateB < num_states_; stateB++) {
                 if(stateA != stateB) {
-                    RealNumType val = mutation_matrices[i * mat_size + (stateB + row_index[stateA])] * rates[i];
+                    RealNumType val = mutation_mat[stateB + row_index[stateA]] * rates[i];
                     mutation_matrices[i * mat_size + (stateB + row_index[stateA])] = val;
                     transposed_mutation_matrices[i * mat_size + (stateA + row_index[stateB])] = val;
                     freqi_freqj_Qijs[i * mat_size + (stateB + row_index[stateA])] = root_freqs[stateA] * inverse_root_freqs[stateB] * val;
