@@ -12,9 +12,14 @@ class Tree;
 /** Class of DNA evolutionary models with rate variation */
 class ModelDNARateVariation : public ModelDNA {
 public:
-    ModelDNARateVariation(  const cmaple::ModelBase::SubModel sub_model, PositionType _genome_size, 
-                            bool _use_site_rates, cmaple::RealNumType _wt_pseudocount, std::string _rates_filename,
-                            int _max_num_EM_steps);
+    ModelDNARateVariation(
+        const cmaple::ModelBase::SubModel sub_model, 
+        PositionType _genome_size, 
+        bool _use_site_rates, 
+        cmaple::RealNumType _wt_pseudocount, 
+        std::string _rates_filename,
+        int _max_num_EM_steps);
+    
     virtual ~ModelDNARateVariation();
 
     void estimateRates(cmaple::Tree* tree);
@@ -80,13 +85,26 @@ public:
 
 private:
 
-    void updateCountsAndWaitingTimesAcrossRoot( PositionType start, PositionType end, 
+    void updateCountsAndWaitingTimesAcrossRoot( PositionType genome_pos, 
                                                 StateType parent_state, StateType child_state,
                                                 RealNumType dist_to_root, RealNumType dist_to_observed,
                                                 RealNumType* waiting_times, RealNumType* counts,
                                                 RealNumType weight = 1.);
     
     void readRatesFile();
+
+    std::vector<RealNumType> getRelativeProbabilityOfParentOStatesForRegion( const cmaple::SeqRegion* seqP_region, 
+                                                                            StateType child_state, 
+                                                                            RealNumType branch_length_to_obs,
+                                                                            PositionType genome_pos);
+    std::vector<RealNumType> getRelativeProbabilityOfChildOStatesForRegion(  const cmaple::SeqRegion* seqC_region, 
+                                                                            StateType parent_state, 
+                                                                            RealNumType branch_length_to_obs,
+                                                                            PositionType genome_pos);
+    std::vector<RealNumType> getRelativeProbabilityOfParentOChildOStatesForRegion(const cmaple::SeqRegion* seqP_region, 
+                                                                                const cmaple::SeqRegion* seqC_region,  
+                                                                                RealNumType branch_length_to_obs,
+                                                                                PositionType genome_pos);
 
     cmaple::PositionType genome_size;
 
@@ -97,7 +115,7 @@ private:
     cmaple::RealNumType* freqj_transposedijs = nullptr;
     cmaple::RealNumType* rates = nullptr;
     uint16_t mat_size;
-    bool use_site_rates = false;
+    bool scalar_rate_model = false;
     bool rates_estimated = false;
 
     cmaple::RealNumType waiting_time_pseudocount;
