@@ -469,11 +469,26 @@ class Tree {
   /*! \endcond */
 
  private:
-  /**
-   * Get mutation string for MATs
-   */
-  std::string getMutationStringForNode(cmaple::PhyloNode& node);
-
+    /**
+     * Get mutation string for MATs
+     */
+    std::string getMutationStringForNode(cmaple::PhyloNode& node);
+    
+     /**
+     * Minimum support for writing a mutation to MAT
+     */   
+    RealNumType min_mutation_support = 0.01;
+    /**
+     * Helper function when last observation of state goes across the root.
+     */  
+    std::string getMutationStringAcrossRoot(
+        RealNumType dist_to_root, 
+        RealNumType dist_to_observed,
+        StateType parent_state, 
+        StateType child_state, 
+        PositionType pos, 
+        RealNumType weight,
+        SeqRegion::SeqType seq_type );
   /**
       Pointer  to LoadTree method
    */
