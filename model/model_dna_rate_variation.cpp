@@ -358,7 +358,7 @@ void ModelDNARateVariation::estimateRatePerSite(cmaple::Tree* tree){
     for(int i = 0; i < genome_size; i++) {
         RealNumType expected_rate_no_substitution = 0;
         for(int j = 0; j < num_states_; j++) {
-            RealNumType summand = waiting_times[i * num_states_ + j] * abs(diagonal_mut_mat[row_index[j] + j]);
+            RealNumType summand = waiting_times[i * num_states_ + j] * abs(diagonal_mut_mat[j]);
             expected_rate_no_substitution += summand;
         }
         rates[i] = (num_substitutions[i]+1) / (expected_rate_no_substitution+1);
