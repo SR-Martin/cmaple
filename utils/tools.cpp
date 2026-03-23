@@ -1530,6 +1530,17 @@ void cmaple::usage_cmaple() {
       << endl
       << "                        alternative SPRs."
       << endl
+      << "RATE VARIATION MODELS:" << endl
+      << "  --rate-variation                  Use a model of rate variation where each site " << endl
+      << "                                    has an independent scalar rate multiplier." << endl
+      << "  --site-specific-rate-matrix       Use a model of rate variation where each site " << endl
+      << "                                    has an independent rate matrix." << endl
+      << "  --estimate-rates-during-SPR       Re-estimate rates after every SPR tree traversal " << endl
+      << "                                    (default: only after initial tree construction)." << endl
+      << "  --waiting-time-pseudocount <NUM>  Set the waiting-time pseudocount (default: 1)." << endl
+      << "  --rv-max-EM-steps <NUM>.          Maximum number of steps to attempt for EM " << endl
+      << "                                    convergence when estimating rates with " << endl
+      << "                                    --site-specific-rate-matrix (default: 20)." << endl
       << endl;
 
   exit(0);
