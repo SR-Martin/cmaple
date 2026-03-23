@@ -1497,6 +1497,9 @@ void cmaple::usage_cmaple() {
       << "  --mean-subs <NUM>    Specify the mean #substitutions per site" << endl
       << "                       that CMAPLE is effective. Default: 0.02."
       << endl
+      << "  --estimate-MAT       Write a mutation-annotated tree (MAT) to " << endl
+      << "                       nexus file."
+      << endl
       << "  --seed <NUM>         Set a seed number for random generators."
       << endl
       << "  -v <MODE>            Set the verbose mode "
