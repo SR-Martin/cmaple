@@ -16,10 +16,10 @@ public:
         const cmaple::ModelBase::SubModel sub_model, 
         PositionType _genome_size, 
         bool _use_site_rates, 
-        cmaple::RealNumType _wt_pseudocount, 
-        std::string _rates_filename,
+        cmaple::RealNumType _wt_pseudocount,
         int _max_num_EM_steps,
-        int _fixed_num_SSM_EM_steps);
+        int _fixed_num_SSM_EM_steps,
+        std::string _rates_filename);
     
     virtual ~ModelDNARateVariation();
 

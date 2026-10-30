@@ -52,6 +52,11 @@
 #include <omp.h> /* OpenMP */
 #endif
 
+#if defined(Backtrace_FOUND)
+#include <execinfo.h>
+#include <cxxabi.h>
+#endif
+
 /*#ifdef NDEBUG
 #define ASSERT(EXPRESSION) ((void)0)
 #else
@@ -542,6 +547,25 @@ class Params {
    * substitution rate matrix. Default: 25
    */
   PositionType mutation_update_period;
+    
+    /**
+     * The minimum number of taxa existing on the tree required to enable
+     * parallel placement search. Default: 1000
+     */
+    NumSeqsType min_taxa_parallel_placement;
+    
+    /**
+     * The number of samples are processed per threads
+     * when searching placements in parallel. Default: 5
+     */
+    NumSeqsType num_samples_per_thread;
+    
+    /**
+     * The number of steps moving upwards to extend the second (sequential)
+     * search of placement starting from the placement found from
+     * the first (parallel) search. Default: 2
+     */
+    NumSeqsType upward_search_extension;
 
   /**
   *  Name of the output alignment
@@ -768,6 +792,40 @@ class Params {
    * the mean number of substitution per sites that CMAPLE is effective
   */
   RealNumType mean_subs_per_site;
+    
+    /**
+     * The maximum number of positive-branch descendants for
+     * a subtree with a local reference
+     * Default: 50
+     */
+    NumSeqsType min_desc_ref;
+    
+    /**
+     * Minimum number of mutations required for a local reference
+     * Default: 2
+     */
+    int min_mut_ref;
+    
+    /**
+     * FALSE to turn off local references
+     * Default: TRUE
+     */
+    bool local_refs;
+
+    /**
+     * TRUE to always run full branch-length optimization when placing on
+     * branches longer than deep_long_bl_search_thresh. This improves
+     * accuracy for long branches at the cost of extra computation.
+     * Default: FALSE
+     */
+    bool deep_long_bl_search;
+
+    /**
+     * Branch length threshold above which deep_long_bl_search triggers full
+     * optimization. Computed from genome size as (log(lRef) + 5) / lRef.
+     * Only used when deep_long_bl_search is TRUE.
+     */
+    RealNumType deep_long_bl_search_thresh;
 
   /*
       TRUE to log debugging
@@ -875,6 +933,39 @@ class ParamsBuilder {
    * @throw std::invalid\_argument if stop\_search\_thresh is non-positive
    */
   ParamsBuilder& withStopTreeSearchThresh(const double& stop_search_thresh);
+    
+    /*! \brief Set the flag to compute
+     * [SPRTA](https://www.nature.com/articles/s41586-025-09567-x)
+     * support. Default: FALSE
+     * @param[in] compute_SPRTA TRUE to compute SPRTA supports
+     * @return A reference to the ParamsBuilder instance
+     */
+    ParamsBuilder& withComputeSPRTA(const bool& compute_SPRTA);
+    
+    /*! \brief Set the flag to compute
+     * [SPRTA](https://www.nature.com/articles/s41586-025-09567-x)
+     * supports for zero-length branches. Default: FALSE
+     * @param[in] compute_zero_branches TRUE to compute SPRTA supports
+     * for zero-length branches
+     * @return A reference to the ParamsBuilder instance
+     */
+    ParamsBuilder& withComputeSPRTAZeroBranches(const bool& compute_zero_branches);
+    
+    /*! \brief Set the flag to output alternative SPRs and their
+     * [SPRTA](https://www.nature.com/articles/s41586-025-09567-x)
+     * supports. Defaut: FALSE
+     * @param[in] out_alter_spr TRUE to output alternative SPRs
+     * and their SPRTA supports
+     * @return A reference to the ParamsBuilder instance
+     */
+    ParamsBuilder& withOutAlterSPR(const bool& out_alter_spr);
+    
+    /*! \brief Set the flag to use multiple local references along the tree
+     * rather than a single global reference at root. Defaut: TRUE
+     * @param[in] use_local_ref TRUE to use local references
+     * @return A reference to the ParamsBuilder instance
+     */
+    ParamsBuilder& withLocalRef(const bool& use_local_ref);
 
   /*! \brief Build the Params object after initializing parameters
    * @return a unique pointer to an instance of Params
@@ -1303,4 +1394,9 @@ std::unique_ptr<T> make_unique(Args&&... args) {
  * @param instream the input stream
  */
 void resetStream(std::istream& instream);
+
+/**
+ * Print backtrace
+ */
+void print_backtrace(std::ostream &out, unsigned int max_frames = 63);
 }  // namespace cmaple

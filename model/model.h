@@ -37,24 +37,31 @@ class Model {
    * DAYHOFF, MTREV, MTART, MTZOA, MTMET, MTVER, MTINV, MTMAM, FLAVI, HIVB,
    * HIVW, FLU, RTREV, CPREV, NQ_PFAM, NQ_BIRD, NQ_MAMMAL, NQ_INSECT, NQ_PLANT,
    * NQ_YEAST; <br> <em> See [**Substitution
-   * models**](http://www.iqtree.org/doc/Substitution-Models) for references of
+   * models**](https://iqtree.github.io/doc/Substitution-Models) for references of
    * those models.</em>
    * @param[in] seqtype Data type of sequences (optional): SEQ_DNA (nucleotide
    * data), SEQ_PROTEIN (amino acid data), or SEQ_AUTO (auto detection)
+   * @param[in] site_spec_matrix True to use site-specific exchangeability matrices (optional). Default: False;
+   * @param[in] site_spec_scalar_rate True to use site-specific scalar rates (optional). Default: False;
+   * @param[in] seq_length Length of the genomes (optional). Default: 0;
+   * @param[in] wt_pseudocount Pseudocount used for waiting times
+   * when estimating site-specific exchangeability matrices (optional). Default: 0.1;
+   * @param[in] max_num_EM_steps Maximum number of EM iterations for estimating rates (optional). Default: 20;
+   * @param[in] rates_filename Name of the file that contains rates (optional). Default: "";
    * @throw std::invalid\_argument if any of the following situations occur.
    * - sub\_model is unknown/unsupported
    * - sub_model is DEFAULT and seqtype is SEQ_AUTO
    */
   Model(
-      cmaple::PositionType ref_genome_size,
-      bool _rate_variation,
-      bool _siteRates,
-      cmaple::RealNumType wt_pseudocount,
-      const std::string _rates_filename,
-      int _max_num_EM_steps,
-      int _fixed_SSM_EM_steps,
       const cmaple::ModelBase::SubModel sub_model = cmaple::ModelBase::DEFAULT,
-      const cmaple::SeqRegion::SeqType seqtype = cmaple::SeqRegion::SEQ_AUTO);
+      const cmaple::SeqRegion::SeqType seqtype = cmaple::SeqRegion::SEQ_AUTO,
+      const bool site_spec_matrix = false,
+      const bool site_spec_scalar_rate = false,
+      const cmaple::PositionType seq_length = 0,
+      const cmaple::RealNumType wt_pseudocount = 0.1,
+      const int max_num_EM_steps = 20,
+      const int fixed_SSM_EM_steps = 0,
+      const std::string& rates_filename = "");
 
   /*! \brief Destructor
    */
