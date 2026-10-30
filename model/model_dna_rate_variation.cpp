@@ -103,7 +103,7 @@ void ModelDNARateVariation::estimateRates(cmaple::Tree* tree) {
         if(cmaple::verbose_mode > VB_MIN) 
         {
             std::string model = scalar_rate_model ? "scalar rate variation" : "site-specific rate matrix";
-            std::cout << "Estimation mutation rates under " << model << " model..." << std::endl;
+            std::cout << "Estimating mutation rates under " << model << " model..." << std::endl;
             std::cout << "Starting log-LK: " << 
             std::setprecision(10) << new_LK << std::endl;
         }
@@ -129,7 +129,7 @@ void ModelDNARateVariation::estimateRates(cmaple::Tree* tree) {
                     new_LK = tree->computeLh();
                     if(cmaple::verbose_mode > VB_MIN) 
                     {
-                        std::cout << "EM round " << i + 1 << ": " << 
+                        std::cout << "\tEM step " << i + 1 << ": " << 
                         std::setprecision(10) << new_LK << std::endl;
                     }                  
                 }
@@ -145,7 +145,7 @@ void ModelDNARateVariation::estimateRates(cmaple::Tree* tree) {
                     new_LK = tree->computeLh();
                     if(cmaple::verbose_mode > VB_MIN) 
                     {
-                        std::cout << "EM round " << num_steps + 1 << ": " << 
+                        std::cout << "\tEM step " << num_steps + 1 << ": " << 
                         std::setprecision(10) << new_LK << std::endl;
                     }
                     num_steps++;
